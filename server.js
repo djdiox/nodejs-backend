@@ -1,62 +1,94 @@
 'use strict';
-
 /*
- * nodejs-express-mongoose
- * Copyright(c) 2015 Madhusudhan Srinivasa <madhums8@gmail.com>
- * MIT Licensed
+ * Generic backend Server Start Poinrt
+ * 
+ * Created by Markus Wagner
  */
+
+/**
+ * Loads the env file with dotenv library
+ */
+require('dotenv').config();
 
 /**
  * Module dependencies
  */
-
-require('dotenv').config();
-
-const fs = require('fs');
-const join = require('path').join;
-const express = require('express');
-const mongoose = require('mongoose');
-const passport = require('passport');
-const config = require('./config');
-
-const models = join(__dirname, 'app/models');
-const port = process.env.PORT || 3000;
-
-const app = express();
-const connection = connect();
+const fs = require('fs'),
+  join = require('path').join,
+  express = require('express'),
+  mongoose = require('mongoose'),
+  passport = require('passport'),
+  config = require('./config'),
+  log = require('winston'),
+  app = express();
 
 /**
- * Expose
+ * Establishes an Connection with logging on MongoDB
+ * 
+ * @returns {Object} an Instance of the current MongoDB Connection
  */
-
-module.exports = {
-  app,
-  connection
+const connectToMongoDB = () => {
+  const options = { server: { socketOptions: { keepAlive: 1 } } };
+  const connection = mongoose.connect(config.db, options).connection;
+  connection.on('open', () => log.info('Connected to the Database via ' + config.db));
+  connection.on('error', err => log.error(err));
+  return connection;
 };
 
-// Bootstrap models
-fs.readdirSync(models)
-  .filter(file => ~file.indexOf('.js'))
-  .forEach(file => require(join(models, file)));
-
-// Bootstrap routes
-require('./config/passport')(passport);
-require('./config/express')(app, passport);
-require('./config/routes')(app, passport);
-
-connection
-  .on('error', console.log)
-  .on('disconnected', connect)
-  .once('open', listen);
-
-function listen () {
+/**
+ * Performs an Listen on a specify port
+ * 
+ * @param port specefies an port which will be used for the HTTP Server
+ * 
+ */
+const listen = (port) => {
   if (app.get('env') === 'test') return;
   app.listen(port);
-  console.log('Express app started on port ' + port);
-}
+  log.info('Listening with Express on Port: ' + port);
+};
 
-function connect () {
-  var options = { server: { socketOptions: { keepAlive: 1 } } };
-  var connection = mongoose.connect(config.db, options).connection;
+/**
+ * Initializes the complete Application
+ * Including following Components:
+ * - Models
+ * - Passport
+ * - Express
+ * - Routes
+ * 
+ * @returns {Object} The Current Instance of the Connection
+ */
+const init = () => {
+  const models = join(__dirname, 'app/models');
+  // Bootstrap models
+  fs.readdirSync(models)
+    .filter(file => ~file.indexOf('.js'))
+    .forEach(file => require(join(models, file)));
+
+  // Bootstrap routes
+  require('./config/passport')(passport);
+  require('./config/express')(app, passport);
+  require('./config/routes')(app, passport);
+
+  // Initialize Express
+  const connection = connectToMongoDB();
+  const port = process.env.PORT || 3000;
+  connection
+    .on('error', err => log.error(err))
+    .on('disconnected', connectToMongoDB)
+    .once('open', () => listen(port));
   return connection;
-}
+};
+
+/**
+ * Run Initialization
+ */
+(() => {
+  const connection = init();
+  /**
+   * Expose
+   */
+  module.exports = {
+    app,
+    connection
+  };
+})();

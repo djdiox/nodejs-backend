@@ -2,23 +2,22 @@
  * Module dependencies.
  */
 
-var express = require('express');
-var session = require('express-session');
-var compression = require('compression');
-var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
-var cookieSession = require('cookie-session');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var csrf = require('csurf');
-
-var mongoStore = require('connect-mongo')(session);
-var flash = require('connect-flash');
-var winston = require('winston');
-var helpers = require('view-helpers');
-var jade = require('jade');
-var config = require('./');
-var pkg = require('../package.json');
+const express = require('express'),
+    session = require('express-session'),
+    compression = require('compression'),
+    morgan = require('morgan'),
+    cookieParser = require('cookie-parser'),
+    cookieSession = require('cookie-session'),
+    bodyParser = require('body-parser'),
+    methodOverride = require('method-override'),
+    csrf = require('csurf'),
+    mongoStore = require('connect-mongo')(session),
+    flash = require('connect-flash'),
+    winston = require('winston'),
+    helpers = require('view-helpers'),
+    jade = require('jade'),
+    config = require('./'),
+    pkg = require('../package.json');
 
 var env = process.env.NODE_ENV || 'development';
 
@@ -26,7 +25,7 @@ var env = process.env.NODE_ENV || 'development';
  * Expose
  */
 
-module.exports = function(app, passport) {
+module.exports = function (app, passport) {
 
     // Compression middleware (should be placed before express.static)
     app.use(compression({
@@ -41,7 +40,7 @@ module.exports = function(app, passport) {
     if (env !== 'development') {
         log = {
             stream: {
-                write: function(message, encoding) {
+                write: function (message, encoding) {
                     winston.info(message);
                 }
             }
@@ -59,7 +58,7 @@ module.exports = function(app, passport) {
     app.set('view engine', 'jade');
 
     // expose package.json to views
-    app.use(function(req, res, next) {
+    app.use(function (req, res, next) {
         res.locals.pkg = pkg;
         res.locals.env = env;
         next();
@@ -70,7 +69,7 @@ module.exports = function(app, passport) {
         extended: true
     }));
     app.use(bodyParser.json());
-    app.use(methodOverride(function(req, res) {
+    app.use(methodOverride(function (req, res) {
         if (req.body && typeof req.body === 'object' && '_method' in req.body) {
             // look in urlencoded POST bodies and delete it
             var method = req.body._method;
