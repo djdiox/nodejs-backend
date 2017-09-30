@@ -5,42 +5,44 @@
  */
 
 const home = require('../app/controllers/home');
+const express = require('express');
+// const auth = require('./middlewares/authorization');
 
 /**
  * Expose
  */
 
-module.exports = function(app, passport) {
-
+module.exports = (app, passport) => {
 
     const fileUpload = require('express-fileupload');
     // default options
     app.get('/', home.index);
     app.use(fileUpload());
+    
+//   const pauth = passport.authenticate.bind(passport);
 
 
-    app.post('/upload', function(req, res) {
+    app.post('/upload', (req, res) => {
         if (!req.files)
             return res.status(400).send('No files were uploaded.');
 
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-        let sampleFile = req.files.sampleFile;
+        const sampleFile = req.files.sampleFile;
 
         // Use the mv() method to place the file somewhere on your server
-        sampleFile.mv('./' + sampleFile.name, function(err) {
+        sampleFile.mv('./' + sampleFile.name, (err) => {
             if (err)
                 return res.status(500).send(err);
 
             res.send('File uploaded!');
         });
     });
-    const express = require('express');
     app = express();
     /**
      * Error handling
      */
 
-    app.use(function(err, req, res, next) {
+    app.use((err, req, res, next) => {
         // treat as 404
         if (err.message &&
             (~err.message.indexOf('not found') ||
@@ -53,7 +55,7 @@ module.exports = function(app, passport) {
     });
 
     // assume 404 since no middleware responded
-    app.use(function(req, res, next) {
+    app.use((req, res, next) => {
         res.status(404).render('404', {
             url: req.originalUrl,
             error: 'Not found'
