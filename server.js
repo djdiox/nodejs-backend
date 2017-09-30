@@ -1,14 +1,9 @@
 'use strict';
 /*
- * Generic backend Server Start Poinrt
+ * Generic backend Server Start Point
  * 
  * Created by Markus Wagner
  */
-
-/**
- * Loads the env file with dotenv library
- */
-require('dotenv').config();
 
 /**
  * Module dependencies
@@ -21,6 +16,12 @@ const fs = require('fs'),
   config = require('./config'),
   log = require('winston'),
   app = express();
+
+
+/**
+ * Loads the env file with dotenv library
+ */
+require('dotenv').config();
 
 /**
  * Establishes an Connection with logging on MongoDB
