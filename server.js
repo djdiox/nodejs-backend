@@ -27,8 +27,7 @@ const fs = require('fs'),
  * 
  * @returns {Object} an Instance of the current MongoDB Connection
  */
-const connectToMongoDB = () => {
-  const options = { server: { socketOptions: { keepAlive: 1 } } };
+const connectToMongoDB = (options) => {
   const connection = mongoose.connect(config.db, options).connection;
   connection.on('open', () => log.info('Connected to the Database via ' + config.db));
   connection.on('error', err => log.error(err));
@@ -58,6 +57,8 @@ const listen = (port) => {
  * @returns {Object} The Current Instance of the Connection
  */
 const init = () => {
+  const options = { server: { socketOptions: { keepAlive: 1 } } };
+  const port = process.env.PORT || 3000;
   const models = join(__dirname, 'app/models');
   // Bootstrap models
   fs.readdirSync(models)
@@ -70,11 +71,10 @@ const init = () => {
   require('./config/routes')(app, passport);
 
   // Initialize Express
-  const connection = connectToMongoDB();
-  const port = process.env.PORT || 3000;
+  const connection = connectToMongoDB(options);
   connection
     .on('error', err => log.error(err))
-    .on('disconnected', connectToMongoDB)
+    .on('disconnected', () => connectToMongoDB(options))
     .once('open', () => listen(port));
   return connection;
 };
