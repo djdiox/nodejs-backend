@@ -5,8 +5,15 @@
  * Created by Markus Wagner
  */
 
+ /**
+  * In first place we want to init the logger and set the logLevel
+  * After that all other stuff will be done
+  */
+const winston = require('winston'),
+  config = require('./config');
+  winston.level = config.logLevel || 'info';
 /**
- * Module dependencies
+ * Other Module dependencies
  */
 const fs = require('fs'),
   join = require('path').join,
@@ -23,17 +30,14 @@ const fs = require('fs'),
   csrf = require('csurf'),
   mongoStore = require('connect-mongo')(session),
   flash = require('connect-flash'),
-  winston = require('winston'),
   helpers = require('view-helpers'),
   jade = require('jade'),
-  config = require('./config'),
   pkg = require('./package.json'),
-  log = require('winston'),
   LocalStrategy = require('passport-local').Strategy,
-  app = express(''),
-  models = require('./config/bootstrap-models').handlers(join, log, fs)(),
+  app = express(),
+  models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
   local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  expressCreator = require('./config/express').handlers(express, session, compression, morgan, cookieParser, cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg);
+  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser, cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg);
 /**
  * Loads the env file with dotenv library
  */
@@ -46,8 +50,8 @@ require('dotenv').config();
  */
 const connectToMongoDB = (options) => {
   const connection = mongoose.connect(config.db, options).connection;
-  connection.on('open', () => log.info('Connected to the Database via ' + config.db));
-  connection.on('error', err => log.error(err));
+  connection.on('open', () => winston.info('Connected to the Database via ' + config.db));
+  connection.on('error', err => winston.error(err));
   return connection;
 };
 
@@ -60,7 +64,7 @@ const connectToMongoDB = (options) => {
 const listen = (port) => {
   if (app.get('env') === 'test') return;
   app.listen(port);
-  log.info('Listening with Express on Port: ' + port);
+  winston.info('Listening with Express on Port: ' + port);
 };
 
 /**
@@ -79,7 +83,7 @@ const init = () => {
 
   // Bootstrap routes
 
-  expressCreator(app, passport);
+  createMiddleware(app, passport);
   require('./config/routes')(app, passport);
 
   require('./config/passport')
@@ -87,7 +91,7 @@ const init = () => {
   // Initialize Express
   const connection = connectToMongoDB(options);
   connection
-    .on('error', err => log.error(err))
+    .on('error', err => winston.error(err))
     .on('disconnected', () => connectToMongoDB(options))
     .once('open', () => listen(port));
   return connection;

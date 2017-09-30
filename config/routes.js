@@ -6,6 +6,10 @@
 
 const home = require('../app/controllers/home');
 const express = require('express');
+const mongoose = require('mongoose');
+const uuid = require('uuid');
+const baseController = require('../app/controllers/base').handlers(mongoose, uuid);
+const todosController = require('../app/controllers/todos').handlers(baseController, mongoose.model('Todo'));
 // const auth = require('./middlewares/authorization');
 
 /**
@@ -18,9 +22,13 @@ module.exports = (app, passport) => {
     // default options
     app.get('/', home.index);
     app.use(fileUpload());
-    
-//   const pauth = passport.authenticate.bind(passport);
 
+    //   const pauth = passport.authenticate.bind(passport);
+
+    app.get('/todos', todosController.getTodos);
+    app.post('/todos', todosController.createTodo);
+    app.put('/todos', todosController.editTodo);
+    app.delete('/todos', todosController.deleteTodo);
 
     app.post('/upload', (req, res) => {
         if (!req.files)

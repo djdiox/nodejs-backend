@@ -29,6 +29,7 @@
     "express-fileupload": "^0.1.4",
     "express-session": "~1.15.1",
     "forever": "~0.15.1",
+    "http-errors": "^1.6.2",
     "jade": "~1.11.0",
     "log4js": "^2.3.4",
     "method-override": "~2.3.5",
@@ -39,6 +40,8 @@
     "passport-local": "~1.0.0",
     "primeng": "^4.2.1",
     "ramda": "^0.24.1",
+    "rxjs": "^5.4.3",
+    "uuid": "^3.1.0",
     "view-helpers": "~0.1.5",
     "winston": "~2.3.0"
   },

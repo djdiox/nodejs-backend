@@ -14,11 +14,9 @@ module.exports = {
    */
   handlers: (mongoose, local, User) => {
     const passportHandler = (passport) => {
-
       // serialize and deserialize sessions
       passport.serializeUser((user, done) => done(null, user.id));
       passport.deserializeUser((id, done) => User.findOne({ _id: id }, done));
-
       // use these strategies
       passport.use(local);
     };

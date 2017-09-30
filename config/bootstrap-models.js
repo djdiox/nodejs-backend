@@ -21,9 +21,7 @@ module.exports = {
             return models.map((file) => {
                 const object = require(join(modelsPath, file));
                 const modelName = object.modelName;
-                return {
-                    modelName : object
-                };
+                return {}[modelName] = object;
             }); // Inject each Model
         };
         return bootstrapModels;

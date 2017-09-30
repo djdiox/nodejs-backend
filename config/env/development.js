@@ -4,7 +4,9 @@
  */
 
 module.exports = {
-  db: 'mongodb://localhost/your_project_development',
+  db: 'mongodb://localhost/dashboardDB',
+  port:3000,
+  logLevel:'debug',
   facebook: {
     clientID: 'APP_ID',
     clientSecret: 'SECRET',
