@@ -11,7 +11,10 @@ module.exports = {
          * @param {Object} next Express next middleware
          */
         const getTodos = (req, res, next) => {
-            const filters = todosBaseController.parseBody(req.body);
+            let filters = {};
+            if (Object.keys(req.body) > 0) {
+                filters = todosBaseController.parseBody(req.body);
+            }
             todosBaseController.get(filters).then((result) => {
                 res.status(200).json(result);
             }, (err) => {

@@ -8,8 +8,10 @@ const home = require('../app/controllers/home');
 const express = require('express');
 const mongoose = require('mongoose');
 const uuid = require('uuid');
-const baseController = require('../app/controllers/base').handlers(mongoose, uuid);
-const todosController = require('../app/controllers/todos').handlers(baseController, mongoose.model('Todo'));
+const httpError = require('http-errors');
+const log = require('winston');
+const baseController = require('../app/controllers/base').handlers(mongoose, uuid, log);
+const todosController = require('../app/controllers/todos').handlers(baseController, mongoose.model('Todo'), httpError, log);
 // const auth = require('./middlewares/authorization');
 
 /**

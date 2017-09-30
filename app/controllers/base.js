@@ -5,10 +5,12 @@ module.exports = {
      * So the first Injection only returns a factory
      * 
      * @param {Object} mongoose Mongoose ODM
+     * @param {Object} uuid UUID module for node
+     * @param {Objedct} log logger instance
      * @returns {Object} the Instance of the Factory
      */
-    handlers: (mongoose, uuid) => {
-        const createInstance = (currentModel, log) => {
+    handlers: (mongoose, uuid, log) => {
+        const createInstance = (currentModel) => {
             /**
              * Creates an Object with an Model in the Database
              * 
