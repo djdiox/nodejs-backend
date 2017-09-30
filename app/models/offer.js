@@ -21,4 +21,4 @@ const OfferSchema = new Schema({
  * Register
  */
 
-mongoose.model('Offer', OfferSchema);
+module.exports = mongoose.model('Offer', OfferSchema);

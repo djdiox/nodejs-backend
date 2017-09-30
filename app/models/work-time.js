@@ -22,4 +22,4 @@ const WorkTimeSchema = new Schema({
  * Register
  */
 
-mongoose.model('WorkTime', WorkTimeSchema);
+module.exports = mongoose.model('WorkTime', WorkTimeSchema);

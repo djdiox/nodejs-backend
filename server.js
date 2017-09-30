@@ -30,18 +30,10 @@ const fs = require('fs'),
   pkg = require('./package.json'),
   log = require('winston'),
   LocalStrategy = require('passport-local').Strategy,
-  app = express();
-(() => {
-  // Bootstrap models
-  const modelsPath = join(__dirname, 'app/models');
-  const models = fs.readdirSync(modelsPath)
-    .filter(file => ~file.indexOf('.js'));
-  log.debug('Injected Models', models);
-  models.forEach(file => require(join(modelsPath, file))); // Inject each Model
-})();
-const local = require('./config/passport/local').handlers(mongoose.model('User'), LocalStrategy),
+  app = express(''),
+  models = require('./config/bootstrap-models').handlers(join, log, fs)(),
+  local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
   expressCreator = require('./config/express').handlers(express, session, compression, morgan, cookieParser, cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg);
-
 /**
  * Loads the env file with dotenv library
  */

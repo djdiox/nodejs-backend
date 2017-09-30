@@ -22,4 +22,4 @@ const TaskSchema = new Schema({
  * Register
  */
 
-mongoose.model('Task', TaskSchema);
+module.exports = mongoose.model('Task', TaskSchema);

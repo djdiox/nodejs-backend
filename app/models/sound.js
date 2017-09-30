@@ -20,4 +20,4 @@ const SoundSchema = new Schema({
  * Register
  */
 
-mongoose.model('Sound', SoundSchema);
+module.exports = mongoose.model('Sound', SoundSchema);

@@ -22,4 +22,4 @@ const TodoSchema = new Schema({
  * Register
  */
 
-mongoose.model('Todo', TodoSchema);
+module.exports = mongoose.model('Todo', TodoSchema);
