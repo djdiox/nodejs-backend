@@ -1,6 +1,6 @@
 module.exports = {
-    handlers: (baseController, todoModel, createHttpError, log) => {
-        const todosBaseController = baseController.createInstance(todoModel);
+    handlers: (baseController, taskModel, createHttpError, log) => {
+        const tasksBaseController = baseController.createInstance(taskModel);
 
         /**
          * Route Handler for GET Requests on Todos
@@ -10,11 +10,11 @@ module.exports = {
          * @param {Object} res Express Response
          * @param {Object} next Express next middleware
          */
-        const getTodos = async function (req, res, next) {
+        const getTodos = async (req, res, next) => {
             const filters = Object.keys(req.body) > 0 ?
-                todosBaseController.parseBody(req.body) : {};
+                tasksBaseController.parseBody(req.body) : {};
             try {
-                const result = await todosBaseController.get(filters);
+                const result = await tasksBaseController.get(filters);
                 res.status(200).json(result);
             } catch (err) {
                 log.error(err);
@@ -32,11 +32,11 @@ module.exports = {
          */
         const createTodo = (req, res, next) => {
             const newTodo = typeof req.body === 'object' ? req.body :
-                todosBaseController.parseBody(req.body);
+                tasksBaseController.parseBody(req.body);
             if (typeof newTodo === 'undefined' || req.body === 'undefined') {
                 return next(createHttpError(400, 'Body Cannot be Empty'));
             }
-            todosBaseController.create(newTodo).then((result) => {
+            tasksBaseController.create(newTodo).then((result) => {
                 res.status(200).json(result);
             }, (err) => {
                 log.error(err);
@@ -52,11 +52,11 @@ module.exports = {
          * @param {Object} next Express next middleware
          */
         const editTodo = (req, res, next) => {
-            const existingTodo = todosBaseController.parseBody(req.body);
+            const existingTodo = tasksBaseController.parseBody(req.body);
             if (typeof existingTodo === 'undefined' || req.body === 'undefined') {
                 return next(createHttpError(400, 'Body Cannot be Empty'));
             }
-            todosBaseController.edit(existingTodo).then((result) => {
+            tasksBaseController.edit(existingTodo).then((result) => {
                 res.status(200).json(result);
             }, (err) => {
                 log.error(err);
@@ -75,7 +75,7 @@ module.exports = {
             if (typeof req.params.uuid === 'undefined') {
                 return next(createHttpError(400, 'uuid has to be defined in the params'));
             }
-            todosBaseController.delete(req.params.uuid).then((result) => {
+            tasksBaseController.delete(req.params.uuid).then((result) => {
                 res.status(200).json(result);
             }, (err) => {
                 log.error(err);

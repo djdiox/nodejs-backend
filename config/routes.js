@@ -17,12 +17,14 @@ const todosController = require('../app/controllers/todos').handlers(baseControl
 /**
  * Expose
  */
-
 module.exports = (app) => { // passport inject for authoriation
 
+    /**
+     * Route Middlewares
+     */
     const fileUpload = require('express-fileupload');
     // default options
-    app.get('/', home.index);
+    app.get('/', home.index); 
     app.use(fileUpload());
 
     //   const pauth = passport.authenticate.bind(passport);
@@ -47,11 +49,15 @@ module.exports = (app) => { // passport inject for authoriation
     //         res.send('File uploaded!');
     //     });
     // });
+
+    /**
+     * Other generic route middleware
+     */
     app = express();
+
     /**
      * Error handling
      */
-
     app.use((err, req, res, next) => {
         // treat as 404
         if (err.message &&

@@ -32,12 +32,14 @@ const fs = require('fs'),
   flash = require('connect-flash'),
   helpers = require('view-helpers'),
   jade = require('jade'),
+  cors = require('cors'),
   pkg = require('./package.json'),
   LocalStrategy = require('passport-local').Strategy,
   app = express(),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
   local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser, cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg);
+  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser, 
+    cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors);
 /**
  * Loads the env file with dotenv library
  */

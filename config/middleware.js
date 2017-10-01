@@ -35,7 +35,7 @@ module.exports = {
      */
     handlers: (express, session, compression,
         morgan, cookieParser, cookieSession, bodyParser, methodOverride,
-        csrf, mongoStore, flash, winston, helpers, jade, config, pkg) => {
+        csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors) => {
         const handler = (app, passport) => {
 
             // Compression middleware (should be placed before express.static)
@@ -106,6 +106,9 @@ module.exports = {
             // use passport session
             app.use(passport.initialize());
             app.use(passport.session());
+            
+            // Add Cors Header for Clients
+            app.use(cors());
 
             // connect flash for flash messages - should be declared after sessions
             app.use(flash());
