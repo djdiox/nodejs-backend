@@ -42,6 +42,7 @@
     "passport-local": "~1.0.0",
     "ramda": "^0.24.1",
     "rxjs": "^5.4.3",
+    "spotify-web-api-node": "^2.5.0",
     "uuid": "^3.1.0",
     "view-helpers": "~0.1.5",
     "winston": "~2.3.0"

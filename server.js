@@ -5,13 +5,13 @@
  * Created by Markus Wagner
  */
 
- /**
-  * In first place we want to init the logger and set the logLevel
-  * After that all other stuff will be done
-  */
+/**
+ * In first place we want to init the logger and set the logLevel
+ * After that all other stuff will be done
+ */
 const winston = require('winston'),
   config = require('./config');
-  winston.level = config.logLevel || 'info';
+winston.level = config.logLevel || 'info';
 /**
  * Other Module dependencies
  */
@@ -19,6 +19,12 @@ const fs = require('fs'),
   join = require('path').join,
   express = require('express'),
   mongoose = require('mongoose'),
+  SpotifyWebApi = require('spotify-web-api-node'),
+  spotifyApi = new SpotifyWebApi({
+    clientId: config.spotify.clientId,
+    clientSecret: config.spotify.clientSecret,
+    redirectUri: config.spotify.redirectUri
+  }),
   passport = require('passport'),
   session = require('express-session'),
   compression = require('compression'),
@@ -36,10 +42,12 @@ const fs = require('fs'),
   pkg = require('./package.json'),
   LocalStrategy = require('passport-local').Strategy,
   app = express(),
+  rxjs = require('rxjs'),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
   local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser, 
-    cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors);
+  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
+    cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors),
+    externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
 /**
  * Loads the env file with dotenv library
  */
@@ -87,7 +95,7 @@ const init = () => {
 
   createMiddleware(app, passport);
   require('./config/routes')(app, passport);
-
+  externalApiUpdater.getCurrentTopData();
   require('./config/passport')
     .handlers(mongoose, local, mongoose.model('User'))(passport);
   // Initialize Express
