@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const uuid = require('uuid');
 const httpError = require('http-errors');
 const log = require('winston');
+const spotifyController = require('../app/controllers/spotify').handlers();
 const baseController = require('../app/controllers/base').handlers(mongoose, uuid, log);
 const todosController = require('../app/controllers/todos').handlers(baseController, mongoose.model('Todo'), httpError, log);
 // const auth = require('./middlewares/authorization');
@@ -28,11 +29,12 @@ module.exports = (app) => { // passport inject for authoriation
     app.use(fileUpload());
 
     //   const pauth = passport.authenticate.bind(passport);
-
     app.get('/todos', todosController.getTodos);
     app.post('/todos', todosController.createTodo);
     app.put('/todos', todosController.editTodo);
     app.delete('/todos', todosController.deleteTodo);
+
+    app.get('/spotify', spotifyController.spotifyCallback);
 
     // app.post('/upload', (req, res) => {
     //     if (!req.files)

@@ -4,25 +4,33 @@
  */
 
 module.exports = {
-  db: 'mongodb://localhost/your_project_test',
+  db: 'mongodb://localhost/dashboardDB',
+  port: 3000,
+  logLevel: 'debug',
+  baseUrl: 'http://localhost:3000',
   facebook: {
-    clientID: 'APP_ID',
-    clientSecret: 'SECRET',
-    callbackURL: 'http://localhost:3000/auth/facebook/callback',
-    scope: [
-      'email',
-      'user_about_me',
-      'user_friends'
-    ]
+    clientID: 'testFb',
+    clientSecret: 'clientSecretFb',
+    callbackURL: 'http://localhost:3000/auth/facebook/callback'
+  },
+  twitter: {
+    clientID: 'testTwitter',
+    clientSecret: 'clientSecretTwitter',
+    callbackURL: 'http://localhost:3000/auth/twitter/callback'
+  },
+  github: {
+    clientID: 'testGithub',
+    clientSecret: 'clientSectetGitHub',
+    callbackURL: 'http://localhost:3000/auth/github/callback'
   },
   google: {
-    clientID: 'APP_ID',
-    clientSecret: 'SECRET',
-    callbackURL: 'http://localhost:3000/auth/google/callback',
-    scope: [
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
-      'https://www.google.com/m8/feeds',
-    ]
+    clientID: 'testGoogle',
+    clientSecret: 'secretTwitter',
+    callbackURL: 'http://localhost:3000/auth/google/callback'
+  },
+  spotify: {
+    clientId: 'testSpotify',
+    clientSecret: 'secretSpotify',
+    redirectUri: 'http://localhost:3000/spotify'
   }
 };
