@@ -26,6 +26,11 @@ const fs = require('fs'),
     redirectUri: config.spotify.redirectUri
   }),
   passport = require('passport'),
+  FacebookStrategy = require('passport-facebook').Strategy,
+  LocalStrategy = require('passport-local').Strategy,
+  GithubStrategy = require('passport-github').Strategy,
+  TwitterStrategy = require('passport-twitter').Strategy,
+  GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   session = require('express-session'),
   compression = require('compression'),
   morgan = require('morgan'),
@@ -40,14 +45,17 @@ const fs = require('fs'),
   jade = require('jade'),
   cors = require('cors'),
   pkg = require('./package.json'),
-  LocalStrategy = require('passport-local').Strategy,
   app = express(),
   rxjs = require('rxjs'),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
+  google = require('./config/passport/google').handlers(mongoose, GoogleStrategy, config, models['User']),
+  facebook = require('./config/passport/facebook').handlers(mongoose, config, FacebookStrategy, models['User']),
+  twitter = require('./config/passport/twitter').handlers(mongoose, TwitterStrategy, config, models['user'],
+  github = require('./config/passport/github').handlers(mongoose, config, GithubStrategy, models['User']),
   local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
+  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser),
     cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors),
-    externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
+  externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
 /**
  * Loads the env file with dotenv library
  */
