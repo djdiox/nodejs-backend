@@ -8,10 +8,16 @@
 /**
  * In first place we want to init the logger and set the logLevel
  * After that all other stuff will be done
+ * Loads the env file with dotenv library
  */
 const winston = require('winston'),
   config = require('./config');
 winston.level = config.logLevel || 'info';
+require('dotenv').config();
+
+/**
+ */
+
 /**
  * Other Module dependencies
  */
@@ -33,7 +39,7 @@ const fs = require('fs'),
   cookieSession = require('cookie-session'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
-  csrf = require('csurf'),
+  csurf = require('csurf'),
   mongoStore = require('connect-mongo')(session),
   flash = require('connect-flash'),
   helpers = require('view-helpers'),
@@ -45,13 +51,9 @@ const fs = require('fs'),
   rxjs = require('rxjs'),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
   local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
-    cookieSession, bodyParser, methodOverride, csrf, mongoStore, flash, winston, helpers, jade, config, pkg, cors),
-    externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
-/**
- * Loads the env file with dotenv library
- */
-require('dotenv').config();
+  externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston),
+  bootstrapMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
+    cookieSession, bodyParser, methodOverride, csurf, mongoStore, flash, winston, helpers, jade, config, pkg, cors);
 
 /**
  * Establishes an Connection with logging on MongoDB
@@ -91,9 +93,9 @@ const init = () => {
   const options = { server: { socketOptions: { keepAlive: 1 } } };
   const port = process.env.PORT || 3000;
 
+  // Bootstrap middleware
+  bootstrapMiddleware(app, passport);
   // Bootstrap routes
-
-  createMiddleware(app, passport);
   require('./config/routes')(app, passport);
   externalApiUpdater.getCurrentTopData();
   require('./config/passport')
