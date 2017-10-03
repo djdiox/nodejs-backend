@@ -27,7 +27,7 @@ const config = {
   spotify: {
     clientId: process.env.SPOTIFY_CLIENTID,
     clientSecret: process.env.SPOTIFY_SECRET,
-    redirectUri: 'http://localhost:3000/auth/spotify/callback'
+    callbackURL: 'http://localhost:3000/auth/spotify/callback'
   }
 };
 /**

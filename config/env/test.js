@@ -31,6 +31,6 @@ module.exports = {
   spotify: {
     clientId: 'testSpotify',
     clientSecret: 'secretSpotify',
-    redirectUri: 'http://localhost:3000/spotify'
+    callbackURL: 'http://localhost:3000/spotify'
   }
 };

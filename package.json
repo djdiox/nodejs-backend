@@ -43,6 +43,7 @@
     "passport-github": "^1.1.0",
     "passport-google-oauth": "^1.0.0",
     "passport-local": "~1.0.0",
+    "passport-spotify": "^0.3.1",
     "passport-twitter": "^1.0.4",
     "ramda": "^0.24.1",
     "rxjs": "^5.4.3",

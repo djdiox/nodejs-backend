@@ -37,6 +37,7 @@ const fs = require('fs'),
   GithubStrategy = require('passport-github').Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+  SpotifyStrategy = require('passport-spotify').Strategy,
   session = require('express-session'),
   compression = require('compression'),
   morgan = require('morgan'),
@@ -54,12 +55,13 @@ const fs = require('fs'),
   app = express(),
   rxjs = require('rxjs'),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
-  google = require('./config/passport/google').handlers(mongoose, GoogleStrategy, config, models['User']),
-  facebook = require('./config/passport/facebook').handlers(mongoose, config, FacebookStrategy, models['User']),
-  twitter = require('./config/passport/twitter').handlers(mongoose, TwitterStrategy, config, models['user'],
-  github = require('./config/passport/github').handlers(mongoose, config, GithubStrategy, models['User']),
-  local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
-  createMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser),
+  spotify = require('./config/passport/spotify').handlers(SpotifyStrategy, config, models['User']),
+  // google = require('./config/passport/google').handlers(mongoose, GoogleStrategy, config, models['User']),
+  // facebook = require('./config/passport/facebook').handlers(mongoose, config, FacebookStrategy, models['User']),
+  // twitter = require('./config/passport/twitter').handlers(mongoose, TwitterStrategy, config, models['user'],
+  // github = require('./config/passport/github').handlers(mongoose, config, GithubStrategy, models['User']),
+  // local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
+  bootstrapMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
     cookieSession, bodyParser, methodOverride, csurf, mongoStore, flash, winston, helpers, jade, config, pkg, cors),
   externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
 /**
@@ -110,8 +112,8 @@ const init = () => {
   // Bootstrap routes
   require('./config/routes')(app, passport);
   externalApiUpdater.getCurrentTopData();
-  require('./config/passport')
-    .handlers(mongoose, local, mongoose.model('User'))(passport);
+  // require('./config/passport')
+  //   .handlers(mongoose, local, mongoose.model('User'))(passport);
   // Initialize Express
   const connection = connectToMongoDB(options);
   connection
