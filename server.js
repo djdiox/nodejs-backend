@@ -16,28 +16,32 @@ winston.level = config.logLevel || 'info';
 require('dotenv').config();
 
 /**
+ * Override Promise library and set mongoose default Promise
+ * Since overriding javascript's default libs with a lib is not best practice, disable eslint.
+ * For now its fine, since its removes a lot of injects etc.
  */
-
+Promise = require('bluebird');// eslint-disable-line
+const mongoose = require('mongoose');
+mongoose.Promise = Promise;
 /**
  * Other Module dependencies
  */
 const fs = require('fs'),
   join = require('path').join,
   express = require('express'),
-  mongoose = require('mongoose'),
-  SpotifyWebApi = require('spotify-web-api-node'),
-  spotifyApi = new SpotifyWebApi({
-    clientId: config.spotify.clientId,
-    clientSecret: config.spotify.clientSecret,
-    redirectUri: config.spotify.redirectUri
-  }),
+  // SpotifyWebApi = require('spotify-web-api-node'),
+  // spotifyApi = new SpotifyWebApi({
+  //   clientId: config.spotify.clientId,
+  //   clientSecret: config.spotify.clientSecret,
+  //   redirectUri: config.spotify.redirectUri
+  // }),
   passport = require('passport'),
-  FacebookStrategy = require('passport-facebook').Strategy,
-  LocalStrategy = require('passport-local').Strategy,
-  GithubStrategy = require('passport-github').Strategy,
-  TwitterStrategy = require('passport-twitter').Strategy,
-  GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
-  SpotifyStrategy = require('passport-spotify').Strategy,
+  // FacebookStrategy = require('passport-facebook').Strategy,
+  // LocalStrategy = require('passport-local').Strategy,
+  // GithubStrategy = require('passport-github').Strategy,
+  // TwitterStrategy = require('passport-twitter').Strategy,
+  // GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+  // SpotifyStrategy = require('passport-spotify').Strategy,
   session = require('express-session'),
   compression = require('compression'),
   morgan = require('morgan'),
@@ -54,16 +58,31 @@ const fs = require('fs'),
   pkg = require('./package.json'),
   app = express(),
   rxjs = require('rxjs'),
+  _ = require('lodash'),
+  {
+    // These are the basic GraphQL types need in this tutorial
+    GraphQLString,
+    GraphQLList,
+    GraphQLObjectType,
+    // This is used to create required fileds and arguments
+    GraphQLNonNull,
+    // This is the class we need to create the schema
+    GraphQLSchema,
+  } = require('graphql'),
+  { buildSchema } = require('graphql'),
   models = require('./config/bootstrap-models').handlers(join, winston, fs)(),
-  spotify = require('./config/passport/spotify').handlers(SpotifyStrategy, config, models['User']),
+  UserType = require('./app/graphql/types/user-type').handlers(),
+  TodoType = require('./app/graphql/types/todo-type').handlers(_, mongoose.model('Todo'), UserType,GraphQLObjectType, GraphQLNonNull, GraphQLString ),
+  graphQLSchema = require('./app/graphql/schema').handlers(buildSchema, _, TodoType, mongoose.model('Todo'), winston, GraphQLObjectType, GraphQLList, GraphQLSchema),
+  // spotify = require('./config/passport/spotify').handlers(SpotifyStrategy, config, models['User']),
   // google = require('./config/passport/google').handlers(mongoose, GoogleStrategy, config, models['User']),
   // facebook = require('./config/passport/facebook').handlers(mongoose, config, FacebookStrategy, models['User']),
   // twitter = require('./config/passport/twitter').handlers(mongoose, TwitterStrategy, config, models['user'],
   // github = require('./config/passport/github').handlers(mongoose, config, GithubStrategy, models['User']),
   // local = require('./config/passport/local').handlers(models['User'], LocalStrategy),
   bootstrapMiddleware = require('./config/middleware').handlers(express, session, compression, morgan, cookieParser,
-    cookieSession, bodyParser, methodOverride, csurf, mongoStore, flash, winston, helpers, jade, config, pkg, cors),
-  externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
+    cookieSession, bodyParser, methodOverride, csurf, mongoStore, flash, winston, helpers, jade, config, pkg, cors);
+  // externalApiUpdater = require('./config/updaters/external-api-updater').handlers(spotifyApi, rxjs, winston);
 /**
  * Loads the env file with dotenv library
  */
@@ -110,8 +129,8 @@ const init = () => {
   // Bootstrap middleware
   bootstrapMiddleware(app, passport);
   // Bootstrap routes
-  require('./config/routes')(app, passport);
-  externalApiUpdater.getCurrentTopData();
+  require('./config/routes')(app, passport, graphQLSchema);
+  // externalApiUpdater.getCurrentTopData();
   // require('./config/passport')
   //   .handlers(mongoose, local, mongoose.model('User'))(passport);
   // Initialize Express

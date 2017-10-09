@@ -13,19 +13,26 @@ const log = require('winston');
 const spotifyController = require('../app/controllers/spotify').handlers();
 const baseController = require('../app/controllers/base').handlers(mongoose, uuid, log);
 const todosController = require('../app/controllers/todos').handlers(baseController, mongoose.model('Todo'), httpError, log);
+
+const graphqlHTTP = require('express-graphql');
 // const auth = require('./middlewares/authorization');
 
 /**
- * Expose
+ * Injects some dependencies in order to create the routes for our app.
+ * Will bootstrapp GraphQL and it will be available at :host:/graphql
+ * @member routes
+ * 
+ * @param {object} app the current app instance
+ * @param {object} graphQLSchema the graphql schema for bootstrapping graphql
  */
-module.exports = (app) => { // passport inject for authoriation
+module.exports = (app, passport, graphQLSchema) => { // passport inject for authoriation
 
     /**
      * Route Middlewares
      */
     const fileUpload = require('express-fileupload');
     // default options
-    app.get('/', home.index); 
+    app.get('/', home.index);
     app.use(fileUpload());
 
     //   const pauth = passport.authenticate.bind(passport);
@@ -36,6 +43,10 @@ module.exports = (app) => { // passport inject for authoriation
 
     app.get('/spotify', spotifyController.spotifyCallback);
 
+    app.use('/graphql', graphqlHTTP({
+        schema: graphQLSchema,
+        graphiql: true,
+    }));
     // app.post('/upload', (req, res) => {
     //     if (!req.files)
     //         return res.status(400).send('No files were uploaded.');
@@ -78,7 +89,7 @@ module.exports = (app) => { // passport inject for authoriation
             url: req.originalUrl,
             error: 'Not found'
         });
-    
+
     });
 
 
