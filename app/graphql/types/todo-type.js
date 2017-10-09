@@ -1,10 +1,10 @@
 module.exports = {
     handlers: (_, TodoModel, UserType, GraphQLObjectType, GraphQLNonNull, GraphQLString) => {
-        return new GraphQLObjectType({
+        return new GraphQLObjectType({ // since we declare it here our API will be build with this model
             name: 'Todo',
-            description: 'This represent a Todo',
+            description: 'This represents a Todo Item from our list',
             fields: () => ({
-                id: { type: new GraphQLNonNull(GraphQLString) },
+                _id: { type: new GraphQLNonNull(GraphQLString) },
                 title: { type: new GraphQLNonNull(GraphQLString) },
                 body: { type: GraphQLString },
                 // author: {
